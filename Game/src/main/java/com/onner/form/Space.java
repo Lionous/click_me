@@ -4,17 +4,33 @@
  */
 package com.onner.form;
 
+import com.onner.async.ProcessButtons;
+import com.onner.async.ProcessClickMe;
+import com.onner.global.Global;
+
 /**
  *
  * @author lionos
  */
 public class Space extends javax.swing.JFrame {
+    private ProcessButtons processButtons;
+    private ProcessClickMe processClickMe;
+    private Thread processThreadGame;
 
-    /**
-     * Creates new form Space
-     */
     public Space() {
         initComponents();
+        initGeneral();
+    }
+
+    private void initGeneral() {
+        this.setLocationRelativeTo(null);
+        ButtonSpace.setLayout(null);
+        playTheGame.setFocusPainted(false);
+        playTheGame.setBorderPainted(false);
+
+        processClickMe = new ProcessClickMe();
+        processButtons = new ProcessButtons(this.CounterTime, this.ButtonSpace, processClickMe);
+        processThreadGame = new Thread(processButtons);
     }
 
     /**
@@ -38,14 +54,12 @@ public class Space extends javax.swing.JFrame {
         jLabel2 = new javax.swing.JLabel();
         CounterTime = new javax.swing.JLabel();
         ButtonSpace = new javax.swing.JPanel();
-        jToggleButton1 = new javax.swing.JToggleButton();
-        jToggleButton2 = new javax.swing.JToggleButton();
         jLabel1 = new javax.swing.JLabel();
+        playTheGame = new javax.swing.JButton();
 
         jLabel4.setText("jLabel4");
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
-        setPreferredSize(new java.awt.Dimension(1000, 600));
         setResizable(false);
         getContentPane().setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
@@ -90,41 +104,58 @@ public class Space extends javax.swing.JFrame {
 
         jLabel2.setFont(new java.awt.Font("Noto Sans", 1, 24)); // NOI18N
         jLabel2.setForeground(new java.awt.Color(252, 255, 255));
-        jLabel2.setText("Termina:");
-        CounterTimeSpace.add(jLabel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 10, 120, 50));
+        jLabel2.setText("Cambia en:");
+        CounterTimeSpace.add(jLabel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 10, 140, 50));
 
         CounterTime.setFont(new java.awt.Font("Noto Sans", 1, 48)); // NOI18N
         CounterTime.setForeground(new java.awt.Color(252, 255, 255));
         CounterTime.setText("5");
-        CounterTimeSpace.add(CounterTime, new org.netbeans.lib.awtextra.AbsoluteConstraints(140, 10, 40, 50));
+        CounterTimeSpace.add(CounterTime, new org.netbeans.lib.awtextra.AbsoluteConstraints(170, 10, 30, 50));
 
-        playspace.add(CounterTimeSpace, new org.netbeans.lib.awtextra.AbsoluteConstraints(780, 20, 190, 70));
+        playspace.add(CounterTimeSpace, new org.netbeans.lib.awtextra.AbsoluteConstraints(750, 20, 220, 70));
 
         ButtonSpace.setBackground(new java.awt.Color(99, 66, 14));
         ButtonSpace.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(181, 120, 22), 5));
         ButtonSpace.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
-
-        jToggleButton1.setBackground(new java.awt.Color(153, 0, 0));
-        jToggleButton1.setFont(new java.awt.Font("Noto Sans", 1, 36)); // NOI18N
-        jToggleButton1.setText("B");
-        jToggleButton1.setBorderPainted(false);
-        ButtonSpace.add(jToggleButton1, new org.netbeans.lib.awtextra.AbsoluteConstraints(170, 50, -1, -1));
-
-        jToggleButton2.setBackground(new java.awt.Color(153, 0, 0));
-        jToggleButton2.setFont(new java.awt.Font("Noto Sans", 1, 36)); // NOI18N
-        jToggleButton2.setText("A");
-        jToggleButton2.setBorderPainted(false);
-        ButtonSpace.add(jToggleButton2, new org.netbeans.lib.awtextra.AbsoluteConstraints(68, 56, -1, -1));
-
         playspace.add(ButtonSpace, new org.netbeans.lib.awtextra.AbsoluteConstraints(300, 100, 670, 470));
 
         jLabel1.setText("FIfigagasdfasd");
         playspace.add(jLabel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 10, 120, 80));
 
+        playTheGame.setBackground(new java.awt.Color(56, 203, 35));
+        playTheGame.setFont(new java.awt.Font("Noto Sans", 1, 36)); // NOI18N
+        playTheGame.setForeground(new java.awt.Color(255, 255, 255));
+        playTheGame.setText("Jugar");
+        playTheGame.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mousePressed(java.awt.event.MouseEvent evt) {
+                playTheGameMousePressed(evt);
+            }
+        });
+        playspace.add(playTheGame, new org.netbeans.lib.awtextra.AbsoluteConstraints(310, 40, 180, 50));
+
         getContentPane().add(playspace, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 1000, 600));
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
+
+    private void playTheGameMousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_playTheGameMousePressed
+        // TODO add your handling code here:
+        if (Global.stateOfPlay) {
+            playTheGame.setEnabled(true);
+
+            processButtons.stop();
+            Global.stateOfPlay = false;
+            playTheGame.setText("PLAY");
+        } else {
+            this.playTheGame.setEnabled(false);
+
+            processButtons = new ProcessButtons(this.CounterTime, this.ButtonSpace, processClickMe);
+            processThreadGame = new Thread(processButtons);
+            processThreadGame.start();
+            Global.stateOfPlay = true;
+            playTheGame.setText("STOP");
+        }
+    }//GEN-LAST:event_playTheGameMousePressed
 
     /**
      * @param args the command line arguments
@@ -174,8 +205,7 @@ public class Space extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel5;
     private javax.swing.JLabel jLabel6;
     private javax.swing.JLabel jLabel7;
-    private javax.swing.JToggleButton jToggleButton1;
-    private javax.swing.JToggleButton jToggleButton2;
+    private javax.swing.JButton playTheGame;
     private javax.swing.JPanel playspace;
     // End of variables declaration//GEN-END:variables
 }

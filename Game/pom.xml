@@ -16,6 +16,6 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.source>22</maven.compiler.source>
         <maven.compiler.target>22</maven.compiler.target>
-        <exec.mainClass>com.onner.clickandwin.App</exec.mainClass>
+        <exec.mainClass>com.onner.run.App</exec.mainClass>
     </properties>
 </project>

@@ -6,6 +6,7 @@ package com.onner.form;
 
 import com.onner.async.ProcessButtons;
 import com.onner.async.ProcessClickMe;
+import com.onner.async.ProcessPlayer;
 import com.onner.global.Global;
 
 /**
@@ -13,9 +14,11 @@ import com.onner.global.Global;
  * @author lionos
  */
 public class Space extends javax.swing.JFrame {
+    private ProcessPlayer processPlayer;
     private ProcessButtons processButtons;
     private ProcessClickMe processClickMe;
     private Thread processThreadGame;
+    private Thread processPlayerThread;
 
     public Space() {
         initComponents();
@@ -28,9 +31,13 @@ public class Space extends javax.swing.JFrame {
         playTheGame.setFocusPainted(false);
         playTheGame.setBorderPainted(false);
 
+        processPlayer = new ProcessPlayer(this.PlayersSpace);
         processClickMe = new ProcessClickMe();
         processButtons = new ProcessButtons(this.CounterTime, this.ButtonSpace, processClickMe);
+
         processThreadGame = new Thread(processButtons);
+        processPlayerThread = new Thread(processPlayer);
+        processPlayerThread.start();
     }
 
     /**
@@ -46,16 +53,16 @@ public class Space extends javax.swing.JFrame {
         playspace = new javax.swing.JPanel();
         PlayersSpace = new javax.swing.JPanel();
         Player = new javax.swing.JPanel();
-        jLabel3 = new javax.swing.JLabel();
-        jLabel5 = new javax.swing.JLabel();
-        jLabel6 = new javax.swing.JLabel();
-        jLabel7 = new javax.swing.JLabel();
+        title = new javax.swing.JLabel();
+        name = new javax.swing.JLabel();
+        unit = new javax.swing.JLabel();
+        point = new javax.swing.JLabel();
         CounterTimeSpace = new javax.swing.JPanel();
         jLabel2 = new javax.swing.JLabel();
         CounterTime = new javax.swing.JLabel();
         ButtonSpace = new javax.swing.JPanel();
-        jLabel1 = new javax.swing.JLabel();
         playTheGame = new javax.swing.JButton();
+        newPlayer = new javax.swing.JToggleButton();
 
         jLabel4.setText("jLabel4");
 
@@ -74,25 +81,25 @@ public class Space extends javax.swing.JFrame {
         Player.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(142, 103, 22), 2));
         Player.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
-        jLabel3.setFont(new java.awt.Font("Noto Sans", 0, 18)); // NOI18N
-        jLabel3.setForeground(new java.awt.Color(117, 80, 154));
-        jLabel3.setText("Jugador");
-        Player.add(jLabel3, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 0, -1, 30));
+        title.setFont(new java.awt.Font("Noto Sans", 0, 18)); // NOI18N
+        title.setForeground(new java.awt.Color(117, 80, 154));
+        title.setText("Jugador");
+        Player.add(title, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 0, -1, 30));
 
-        jLabel5.setFont(new java.awt.Font("Noto Sans", 1, 24)); // NOI18N
-        jLabel5.setForeground(new java.awt.Color(56, 203, 35));
-        jLabel5.setText("Lanchito");
-        Player.add(jLabel5, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 23, -1, 40));
+        name.setFont(new java.awt.Font("Noto Sans", 1, 24)); // NOI18N
+        name.setForeground(new java.awt.Color(56, 203, 35));
+        name.setText("Lanchito");
+        Player.add(name, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 23, -1, 40));
 
-        jLabel6.setFont(new java.awt.Font("Noto Sans", 1, 18)); // NOI18N
-        jLabel6.setForeground(new java.awt.Color(29, 158, 249));
-        jLabel6.setText("PTS");
-        Player.add(jLabel6, new org.netbeans.lib.awtextra.AbsoluteConstraints(190, 30, 40, 30));
+        unit.setFont(new java.awt.Font("Noto Sans", 1, 18)); // NOI18N
+        unit.setForeground(new java.awt.Color(29, 158, 249));
+        unit.setText("PTS");
+        Player.add(unit, new org.netbeans.lib.awtextra.AbsoluteConstraints(190, 30, 40, 30));
 
-        jLabel7.setFont(new java.awt.Font("Monospaced", 1, 48)); // NOI18N
-        jLabel7.setForeground(new java.awt.Color(29, 158, 249));
-        jLabel7.setText("10");
-        Player.add(jLabel7, new org.netbeans.lib.awtextra.AbsoluteConstraints(130, 10, 60, 50));
+        point.setFont(new java.awt.Font("Monospaced", 1, 48)); // NOI18N
+        point.setForeground(new java.awt.Color(29, 158, 249));
+        point.setText("10");
+        Player.add(point, new org.netbeans.lib.awtextra.AbsoluteConstraints(130, 10, 60, 50));
 
         PlayersSpace.add(Player, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 10, 230, 70));
 
@@ -119,9 +126,6 @@ public class Space extends javax.swing.JFrame {
         ButtonSpace.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
         playspace.add(ButtonSpace, new org.netbeans.lib.awtextra.AbsoluteConstraints(300, 100, 670, 470));
 
-        jLabel1.setText("FIfigagasdfasd");
-        playspace.add(jLabel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 10, 120, 80));
-
         playTheGame.setBackground(new java.awt.Color(56, 203, 35));
         playTheGame.setFont(new java.awt.Font("Noto Sans", 1, 36)); // NOI18N
         playTheGame.setForeground(new java.awt.Color(255, 255, 255));
@@ -133,6 +137,9 @@ public class Space extends javax.swing.JFrame {
         });
         playspace.add(playTheGame, new org.netbeans.lib.awtextra.AbsoluteConstraints(310, 40, 180, 50));
 
+        newPlayer.setText("New");
+        playspace.add(newPlayer, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 50, -1, -1));
+
         getContentPane().add(playspace, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 1000, 600));
 
         pack();
@@ -142,18 +149,20 @@ public class Space extends javax.swing.JFrame {
         // TODO add your handling code here:
         if (Global.stateOfPlay) {
             playTheGame.setEnabled(true);
-
             processButtons.stop();
             Global.stateOfPlay = false;
+            processPlayerThread = new Thread(processPlayer);
+            processPlayerThread.start();
+
             playTheGame.setText("PLAY");
         } else {
             this.playTheGame.setEnabled(false);
-
             processButtons = new ProcessButtons(this.CounterTime, this.ButtonSpace, processClickMe);
             processThreadGame = new Thread(processButtons);
             processThreadGame.start();
             Global.stateOfPlay = true;
             playTheGame.setText("STOP");
+
         }
     }//GEN-LAST:event_playTheGameMousePressed
 
@@ -197,15 +206,15 @@ public class Space extends javax.swing.JFrame {
     private javax.swing.JLabel CounterTime;
     private javax.swing.JPanel CounterTimeSpace;
     private javax.swing.JPanel Player;
-    private javax.swing.JPanel PlayersSpace;
-    private javax.swing.JLabel jLabel1;
+    public javax.swing.JPanel PlayersSpace;
     private javax.swing.JLabel jLabel2;
-    private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
-    private javax.swing.JLabel jLabel5;
-    private javax.swing.JLabel jLabel6;
-    private javax.swing.JLabel jLabel7;
+    private javax.swing.JLabel name;
+    public static javax.swing.JToggleButton newPlayer;
     private javax.swing.JButton playTheGame;
     private javax.swing.JPanel playspace;
+    private javax.swing.JLabel point;
+    private javax.swing.JLabel title;
+    private javax.swing.JLabel unit;
     // End of variables declaration//GEN-END:variables
 }

@@ -16,12 +16,10 @@ public class ProcessButtons implements Runnable {
 
     private long currentTime = 0;
     private int secondsQuantity = 3;
-
     private JLabel labelCounter = null;
     private JPanel playSPace = null;
-    private List<JButton> buttons = new ArrayList<>();
+    private final List<JButton> buttons = new ArrayList<>();
     private Set<JButton> paintedButtons = new HashSet<>();
-
     private ProcessClickMe processClickMe = null;
 
     public ProcessButtons(JLabel counter, JPanel space, ProcessClickMe processClickMe) {
@@ -44,8 +42,8 @@ public class ProcessButtons implements Runnable {
                     this.currentTime = System.currentTimeMillis() / 1000;
                     Global.collision = false;
 
-                    if (elapsedTime >= 3) {
-                        newColorRandom();
+                    if (elapsedTime >= secondsQuantity) {
+                        paintRandomButtons();
                     }
                 }
                 Thread.sleep(1000);
@@ -60,47 +58,7 @@ public class ProcessButtons implements Runnable {
         return ((currentTimeTemp - initTime) >= secondsQuantity);
     }
 
-    public void stop() {
-        Global.stateOfPlay = false;
-    }
-
-    private void generateButtons() {
-        playSPace.removeAll();
-        int buttonWidth = 70;
-        int buttonHeight = 70;
-        int padding = 25;
-        int[] buttonsPerRow = {6, 7, 7, 6};
-        char letter = 'A';
-        for (int row = 0; row < buttonsPerRow.length; row++) {
-            int buttonsInThisRow = buttonsPerRow[row];
-            int xOffset = (playSPace.getWidth() - (buttonsInThisRow * buttonWidth + (buttonsInThisRow - 1) * padding)) / 2;
-
-            for (int col = 0; col < buttonsInThisRow; col++) {
-                if (letter > 'Z') break;
-
-                JButton button = new JButton(String.valueOf(letter));
-                button.setFont(new java.awt.Font("Noto Sans", Font.BOLD, 36));
-                button.setBorderPainted(false);
-                button.setFocusPainted(false);
-                button.setBackground(Color.decode("#f0f0f0"));
-                int x = xOffset + col * (buttonWidth + padding);
-                int y = row * (buttonHeight + padding);
-
-                button.setBounds(x, y + 60, buttonWidth, buttonHeight);
-                playSPace.add(button);
-                buttons.add(button);
-
-                // Thread
-                button.addActionListener(e -> processClickMe.addClick(button));
-
-                letter++;
-            }
-        }
-        playSPace.revalidate();
-        playSPace.repaint();
-    }
-
-    private void newColorRandom() {
+    private void paintRandomButtons() {
         if (buttons.isEmpty()) {
             return;
         }
@@ -123,4 +81,39 @@ public class ProcessButtons implements Runnable {
         paintedButtons.add(randomButton);
     }
 
+    public void generateButtons() {
+        playSPace.removeAll();
+        int buttonWidth = 70;
+        int buttonHeight = 70;
+        int padding = 25;
+        int[] buttonsPerRow = {6, 7, 7, 6};
+        char letter = 'A';
+        for (int row = 0; row < buttonsPerRow.length; row++) {
+            int buttonsInThisRow = buttonsPerRow[row];
+            int xOffset = (playSPace.getWidth() - (buttonsInThisRow * buttonWidth + (buttonsInThisRow - 1) * padding)) / 2;
+            for (int col = 0; col < buttonsInThisRow; col++) {
+                if (letter > 'Z') break;
+                JButton button = new JButton(String.valueOf(letter));
+                button.setFont(new java.awt.Font("Noto Sans", Font.BOLD, 36));
+                button.setBorderPainted(false);
+                button.setFocusPainted(false);
+                button.setBackground(Color.decode("#f0f0f0"));
+                int x = xOffset + col * (buttonWidth + padding);
+                int y = row * (buttonHeight + padding);
+                button.setBounds(x, y + 60, buttonWidth, buttonHeight);
+                playSPace.add(button);
+                buttons.add(button);
+
+                // Thread
+                button.addActionListener(e -> processClickMe.addClick(button));
+                letter++;
+            }
+        }
+        playSPace.revalidate();
+        playSPace.repaint();
+    }
+
+    public void stop() {
+        Global.stateOfPlay = false;
+    }
 }

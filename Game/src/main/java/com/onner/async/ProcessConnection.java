@@ -1,67 +1,112 @@
 package com.onner.async;
-import com.onner.form.Space;
+import com.onner.global.Connection;
+import com.onner.global.Global;
 import com.onner.global.Player;
+import org.json.JSONArray;
+import org.json.JSONObject;
 
 import javax.swing.*;
 import java.util.ArrayList;
+import java.util.UUID;
 import java.util.List;
 
-public class ProcessConnection {
-    private int counter = 0;
-    private static List<Player> players = new ArrayList<>();
-    private JToggleButton newPlayerButton;
+public class ProcessConnection implements Runnable {
+    private Player player;
+    private static String namePlayer = "Player";
+    private String response = "";
 
     public ProcessConnection() {
-        addPlayersFromInput();
+        new Connection();
+        obtainName();
         createUsers();
+        sendInitialData();
+        initUser();
     }
 
-    public List<Player> getPlayers() {
-        return players;
+    private void sendInitialData() {
+        String playerData = serializePlayer(player);
+        Connection.sendMessage(playerData);
     }
 
-    public void addPlayer(Player player) {
-        players.add(player);
-    }
-
-    public List<Player> createUsers() {
-        Player player1 = new Player();
-        player1.setId("id-001");
-        player1.setName("Alice");
-        player1.setPoint(10);
-        player1.setStatus(true);
-        player1.setMessage("Hello Alice");
-
-        Player player2 = new Player();
-        player2.setId("id-002");
-        player2.setName("Bob");
-        player2.setPoint(15);
-        player2.setStatus(false);
-        player2.setMessage("Hello Bob");
-
-        players.add(player1);
-        players.add(player2);
-
-        return players;
-    }
-
-    private void addPlayersFromInput() {
-        newPlayerButton = Space.newPlayer;
-        newPlayerButton.addActionListener(e -> {
-            String name = JOptionPane.showInputDialog("Nombre de jugador:");
-            if (name == null || name.trim().isEmpty()) {
-                return;
+    @Override
+    public void run() {
+        try {
+            while (!Global.stateOfPlay) {
+                response = Connection.receiveMessage();
+                if (response != null && !response.isEmpty()) {
+                    if (response.startsWith("CONECTAR")) {
+                        String jsonResponse = response.substring("CONECTAR".length()).trim();
+                        if (jsonResponse.startsWith("[") && jsonResponse.endsWith("]")) {
+                            processServerResponse(jsonResponse);
+                        } else {
+                            System.out.println("Respuesta CONECTAR no contiene un JSON válido: " + response);
+                        }
+                    }
+                }
+                Thread.sleep(1000);
             }
-            Player player = new Player();
-            counter++;
-            player.setName(name);
-            player.setId("id-"+counter);
-            player.setPoint(0);
-            player.setStatus(true);
-            player.setMessage("");
+        } catch (InterruptedException ex) {
+            System.err.println("Hilo interrumpido: " + ex.getMessage());
+        } finally {
+            System.out.println("Cerrando conexión");
+            Connection.closeConnection();
+        }
+    }
 
-            System.out.println(player); // ----------------
-            addPlayer(player);
-        });
+
+    public void createUsers() {
+        Global.id = UUID.randomUUID().toString().substring(0, 6);
+        player = new Player(Global.id, namePlayer, 0);
+    }
+
+    public String serializePlayer(Player player) {
+        return player.toJson();
+    }
+
+    public static void obtainName() {
+        String name = JOptionPane.showInputDialog("Ingrese su nombre:");
+        if (name == null || name.trim().isEmpty()) {
+            name = "Player";
+        }
+        namePlayer = name;
+    }
+
+    private void initUser() {
+        Global.players.add(player);
+    }
+
+    public void processServerResponse(String response) {
+        if (response != null && !response.isEmpty()) {
+            try {
+                JSONArray jsonArray = new JSONArray(response);
+                updatePlayers(jsonArray);
+            } catch (Exception e) {
+                System.err.println("Error al procesar la respuesta del servidor: " + e.getMessage());
+            }
+        }
+    }
+
+
+    private void updatePlayers(JSONArray jsonArray) {
+        List<Player> updatedPlayers = new ArrayList<>();
+
+        for (int i = 0; i < jsonArray.length(); i++) {
+            JSONObject playerJson = jsonArray.getJSONObject(i);
+            String id = playerJson.optString("id", null);
+            String name = playerJson.optString("name", null);
+            int points = playerJson.optInt("point", 0);
+            boolean status = playerJson.optBoolean("status", false);
+
+            Player player = new Player();
+            player.setName(name);
+            player.setPoint(points);
+            player.setStatus(status);
+            updatedPlayers.add(player);
+        }
+
+        Global.players.clear();
+        Global.players.addAll(updatedPlayers);
+
+        System.out.println("Lista de jugadores actualizada: " + Global.players);
     }
 }

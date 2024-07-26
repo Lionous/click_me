@@ -6,7 +6,9 @@ package com.onner.form;
 
 import com.onner.async.ProcessButtons;
 import com.onner.async.ProcessClickMe;
+import com.onner.async.ProcessConnection;
 import com.onner.async.ProcessPlayer;
+import com.onner.global.Connection;
 import com.onner.global.Global;
 
 /**
@@ -17,8 +19,11 @@ public class Space extends javax.swing.JFrame {
     private ProcessPlayer processPlayer;
     private ProcessButtons processButtons;
     private ProcessClickMe processClickMe;
+    private ProcessConnection processConnection;
+
     private Thread processThreadGame;
     private Thread processPlayerThread;
+    private Thread processConnectionThread;
 
     public Space() {
         initComponents();
@@ -31,13 +36,16 @@ public class Space extends javax.swing.JFrame {
         playTheGame.setFocusPainted(false);
         playTheGame.setBorderPainted(false);
 
-        processPlayer = new ProcessPlayer(this.PlayersSpace);
         processClickMe = new ProcessClickMe();
         processButtons = new ProcessButtons(this.CounterTime, this.ButtonSpace, processClickMe);
+        processConnection = new ProcessConnection();
+        processPlayer = new ProcessPlayer(this.PlayersSpace);
 
         processThreadGame = new Thread(processButtons);
         processPlayerThread = new Thread(processPlayer);
         processPlayerThread.start();
+        processConnectionThread = new Thread(processConnection);
+        processConnectionThread.start();
     }
 
     /**
@@ -62,7 +70,7 @@ public class Space extends javax.swing.JFrame {
         CounterTime = new javax.swing.JLabel();
         ButtonSpace = new javax.swing.JPanel();
         playTheGame = new javax.swing.JButton();
-        newPlayer = new javax.swing.JToggleButton();
+        Conect = new javax.swing.JButton();
 
         jLabel4.setText("jLabel4");
 
@@ -137,8 +145,13 @@ public class Space extends javax.swing.JFrame {
         });
         playspace.add(playTheGame, new org.netbeans.lib.awtextra.AbsoluteConstraints(310, 40, 180, 50));
 
-        newPlayer.setText("New");
-        playspace.add(newPlayer, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 50, -1, -1));
+        Conect.setText("Conectar");
+        Conect.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                ConectMouseClicked(evt);
+            }
+        });
+        playspace.add(Conect, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 60, -1, -1));
 
         getContentPane().add(playspace, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 1000, 600));
 
@@ -154,17 +167,26 @@ public class Space extends javax.swing.JFrame {
             processPlayerThread = new Thread(processPlayer);
             processPlayerThread.start();
 
+            processConnectionThread = new Thread(processConnection);
+            processConnectionThread.start();
+
             playTheGame.setText("PLAY");
+            Connection.sendMessage("PLAY");
         } else {
             this.playTheGame.setEnabled(false);
             processButtons = new ProcessButtons(this.CounterTime, this.ButtonSpace, processClickMe);
             processThreadGame = new Thread(processButtons);
             processThreadGame.start();
+
             Global.stateOfPlay = true;
             playTheGame.setText("STOP");
-
         }
     }//GEN-LAST:event_playTheGameMousePressed
+
+    private void ConectMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_ConectMouseClicked
+        // TODO add your handling code here:
+        Connection.sendMessage("CONECTAR");
+    }//GEN-LAST:event_ConectMouseClicked
 
     /**
      * @param args the command line arguments
@@ -203,6 +225,7 @@ public class Space extends javax.swing.JFrame {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JPanel ButtonSpace;
+    private javax.swing.JButton Conect;
     private javax.swing.JLabel CounterTime;
     private javax.swing.JPanel CounterTimeSpace;
     private javax.swing.JPanel Player;
@@ -210,7 +233,6 @@ public class Space extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel name;
-    public static javax.swing.JToggleButton newPlayer;
     private javax.swing.JButton playTheGame;
     private javax.swing.JPanel playspace;
     private javax.swing.JLabel point;

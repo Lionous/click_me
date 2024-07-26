@@ -1,5 +1,6 @@
 package com.onner.async;
 
+import com.onner.global.Connection;
 import com.onner.global.Global;
 
 import javax.swing.*;
@@ -46,6 +47,7 @@ public class ProcessButtons implements Runnable {
                         paintRandomButtons();
                     }
                 }
+                System.out.println(Connection.receiveMessage());
                 Thread.sleep(1000);
             }
         } catch (InterruptedException ex) {
@@ -58,7 +60,23 @@ public class ProcessButtons implements Runnable {
         return ((currentTimeTemp - initTime) >= secondsQuantity);
     }
 
+    private char letraActual = 'A';
+
     private void paintRandomButtons() {
+        String response = Connection.receiveMessage();
+
+        if (response != null && response.startsWith("PINTAR:")) {
+            char letra = response.substring("PINTAR:".length()).trim().charAt(0);
+            System.out.println("Letra recibida para pintar: " + letra);
+
+            if (letra == 1) {
+                letraActual = letra;
+                paintButtonsBasedOnLetter(letraActual);
+            }
+        }
+    }
+
+    private void paintButtonsBasedOnLetter(char letra) {
         if (buttons.isEmpty()) {
             return;
         }
@@ -67,18 +85,12 @@ public class ProcessButtons implements Runnable {
             button.setBackground(defaultColor);
             button.setOpaque(true);
         }
-        Random rand = new Random();
-        JButton randomButton = null;
-        if (paintedButtons.size() == buttons.size()) {
-            paintedButtons.clear();
+        int buttonIndex = letra - 'A'; // Por ejemplo, mapea A a 0, B a 1, etc.
+        if (buttonIndex >= 0 && buttonIndex < buttons.size()) {
+            JButton buttonToPaint = buttons.get(buttonIndex);
+            buttonToPaint.setBackground(Color.decode("#e33c02"));
+            buttonToPaint.setOpaque(true);
         }
-        do {
-            int randomIndex = rand.nextInt(buttons.size());
-            randomButton = buttons.get(randomIndex);
-        } while (paintedButtons.contains(randomButton));
-        randomButton.setBackground(Color.decode("#e33c02"));
-        randomButton.setOpaque(true);
-        paintedButtons.add(randomButton);
     }
 
     public void generateButtons() {

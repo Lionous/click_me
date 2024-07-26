@@ -10,24 +10,21 @@ public class Player {
     private String name;
     private int point;
     private Boolean status;
-    private String message;
 
     public Player () {}
-    public Player (String id, String name, int point, String message) {
+    public Player (String id, String name, int point) {
         this.id = id;
         this.name = name;
         this.point = point;
         this.status = true;
-        this.message = message;
     }
 
-    @Override
-    public String toString() {
+    public String toJson() {
         return "{" +
-                "id='" + id + '\'' +
-                ",name='" + name + '\'' +
-                ",point=" + point +
-                ",message='" + message + '\'' +
-                '}';
+                "\"id\":\"" + id + "\"," +
+                "\"name\":\"" + name + "\"," +
+                "\"point\":" + point + "," +
+                "\"status\":" + status +
+                "}";
     }
 }

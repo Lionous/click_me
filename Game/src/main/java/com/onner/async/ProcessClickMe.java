@@ -1,10 +1,14 @@
 package com.onner.async;
 
+import com.onner.global.Connection;
+import com.onner.global.Global;
+
 import javax.swing.*;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 public class ProcessClickMe implements Runnable {
     private final ConcurrentLinkedQueue<JButton> clickQueue = new ConcurrentLinkedQueue<>();
+
 
     public ProcessClickMe() {
         new Thread(this).start();
@@ -12,17 +16,19 @@ public class ProcessClickMe implements Runnable {
 
     @Override
     public void run() {
-        while (true) {
-            JButton clickedButton = clickQueue.poll();
-            if (clickedButton != null) {
-                System.out.println("Botón clickeado: " + clickedButton.getText());
-            }
-            try {
+
+        try {
+            while (Global.stateOfPlay) {
+                JButton clickedButton = clickQueue.poll();
+                if (clickedButton != null) {
+                    System.out.println("Botón clickeado: " + clickedButton.getText());
+                    Connection.sendMessage(Global.id + clickedButton.getText());
+                }
+
                 Thread.sleep(100);
-            } catch (InterruptedException e) {
-                Thread.currentThread().interrupt();
-                break;
             }
+        } catch (InterruptedException e) {
+            System.err.println("Hilo interrumpido: " + e.getMessage());
         }
     }
 

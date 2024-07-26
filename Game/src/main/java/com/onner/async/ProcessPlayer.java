@@ -9,12 +9,10 @@ import java.util.List;
 
 public class ProcessPlayer implements Runnable{
 
-    private final ProcessConnection processConnection;
     private final JPanel playerSpace;
 
     public ProcessPlayer(JPanel space) {
         this.playerSpace = space;
-        this.processConnection = new ProcessConnection();
     }
 
     @Override
@@ -29,9 +27,8 @@ public class ProcessPlayer implements Runnable{
         }
     }
 
-
     private void generatePanelForPlayer() {
-        List<Player> playerList = processConnection.getPlayers();
+        List<Player> playerList = Global.players;
         JPanel contentPanel = new JPanel();
         contentPanel.setLayout(null);
         contentPanel.setOpaque(false);
@@ -47,7 +44,6 @@ public class ProcessPlayer implements Runnable{
             contentPanel.add(playerPanel);
             yPosition += panelHeight + padding;
         }
-
         // SCROLL
         contentPanel.setPreferredSize(new Dimension(panelWidth + 20, yPosition + 10)); // Añadir un poco de margen
         JScrollPane scrollPane = new JScrollPane(contentPanel);

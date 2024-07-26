@@ -6,8 +6,6 @@ import com.onner.global.Global;
 import javax.swing.*;
 
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.util.*;
 import java.util.List;
 import java.util.logging.Level;
@@ -20,7 +18,6 @@ public class ProcessButtons implements Runnable {
     private JLabel labelCounter = null;
     private JPanel playSPace = null;
     private final List<JButton> buttons = new ArrayList<>();
-    private Set<JButton> paintedButtons = new HashSet<>();
     private ProcessClickMe processClickMe = null;
 
     public ProcessButtons(JLabel counter, JPanel space, ProcessClickMe processClickMe) {

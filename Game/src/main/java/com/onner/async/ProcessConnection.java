@@ -98,6 +98,7 @@ public class ProcessConnection implements Runnable {
             boolean status = playerJson.optBoolean("status", false);
 
             Player player = new Player();
+            player.setId(id);
             player.setName(name);
             player.setPoint(points);
             player.setStatus(status);
